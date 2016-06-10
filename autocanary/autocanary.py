@@ -21,6 +21,7 @@ from gnupg import GnuPG
 from settings import Settings
 from output_dialog import OutputDialog
 import common
+import feedparser
 
 class AutoCanaryGui(QtGui.QWidget):
 
@@ -129,6 +130,11 @@ class AutoCanaryGui(QtGui.QWidget):
         self.textbox = QtGui.QTextEdit()
         self.textbox.setText(self.settings.get_text())
 
+
+        # add headlines
+        self.add_headlines_button = QtGui.QPushButton('Add Recent News Headlines')
+        self.add_headlines_button.clicked.connect(self.add_headlines)
+
         # key selection
         seckeys = gpg.seckeys_list()
         self.key_selection = QtGui.QComboBox()
@@ -147,7 +153,7 @@ class AutoCanaryGui(QtGui.QWidget):
                     key_i = i
             self.key_selection.setCurrentIndex(key_i)
 
-        # buttons
+        # bottom buttons
         self.buttons_layout = QtGui.QHBoxLayout()
         self.sign_save_button = QtGui.QPushButton('Save and Sign')
         self.sign_save_button.clicked.connect(self.sign_save_clicked)
@@ -161,6 +167,7 @@ class AutoCanaryGui(QtGui.QWidget):
         self.layout.addLayout(self.date_layout)
         self.layout.addLayout(self.status_layout)
         self.layout.addWidget(self.textbox)
+        self.layout.addWidget(self.add_headlines_button)
         self.layout.addWidget(self.key_selection)
         self.layout.addLayout(self.buttons_layout)
         self.setLayout(self.layout)
@@ -351,6 +358,11 @@ class AutoCanaryGui(QtGui.QWidget):
             dialog.exec_()
         else:
             common.alert('Failed to sign message.')
+    def add_headlines(self):
+        feed = feedparser.parse('https://en.wikinews.org/w/index.php?title=Special:NewsFeed&feed=rss&categories=Published&notcategories=No%20publish|Archived|AutoArchived|disputed&namespace=0&count=5&ordermethod=categoryadd&stablepages=only')
+        self.textbox.append('\nRECENT HEADLINES:\n')
+        for entry in feed.entries:
+            self.textbox.append("- " + entry.title)
 
 def main():
     # start the app
