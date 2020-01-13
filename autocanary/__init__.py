@@ -449,7 +449,7 @@ def main():
 
     elif system == 'Windows':
         if not gpg.is_gpg_available():
-            common.alert('GPG doesn\'t seem to be installed. Install <a href="http://gpg4win.org/">Gpg4win</a>, generate a key, and run AutoCanary again.')
+            common.alert('GPG doesn\'t seem to be installed. Install <a href="https://gpg4win.org/">Gpg4win</a>, generate a key, and run AutoCanary again.')
             sys.exit(0)
 
         seckeys = gpg.seckeys_list()
